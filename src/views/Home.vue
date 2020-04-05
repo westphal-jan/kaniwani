@@ -45,7 +45,8 @@ export default {
   },
   computed: {
     isValidAccessToken: function () {
-      return this.accessToken.match('[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}') !== null
+      return true
+      // return this.accessToken.match('[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}') !== null
     }
   },
   methods: {
@@ -57,6 +58,7 @@ export default {
         .then(response => {
           console.log('Hello', response.data.data.username)
           this.setAccessToken(this.accessToken)
+          this.$router.push({ path: '/kaniwani/study' })
         })
         .catch(error => console.log(error))
     },

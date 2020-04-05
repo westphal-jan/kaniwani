@@ -2,7 +2,7 @@
   <div id="app">
     <div id="nav">
       <router-link to="/kaniwani">Home</router-link> |
-      <router-link to="/kaniwani/about">About</router-link>
+      <router-link to="/kaniwani/study">Study</router-link>
     </div>
     <router-view/>
   </div>
