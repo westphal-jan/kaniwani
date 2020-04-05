@@ -15,7 +15,7 @@
                   <input v-model="accessToken" class="form-control form-control-lg" placeholder="Enter your personal access token...">
                 </div>
                 <div class="col-12 col-md-3">
-                  <button type="submit" class="btn btn-block btn-lg btn-primary" v-bind:disabled="disabledButton">Let's go!</button>
+                  <button type="submit" class="btn btn-block btn-lg btn-primary" v-bind:disabled="!isValidAccessToken">Let's go!</button>
                 </div>
               </div>
               <div class="col-xl-12 mx-auto">
@@ -32,6 +32,7 @@
 
 <script>
 import axios from 'axios'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'Home',
@@ -39,14 +40,12 @@ export default {
   },
   data () {
     return {
-      accessToken: '',
-      disabledButton: true
+      accessToken: this.$store.state.accessToken
     }
   },
-  watch: {
-    accessToken: function (newValue) {
-      const isValidAccessToken = newValue.match('[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}') !== null
-      this.disabledButton = !isValidAccessToken
+  computed: {
+    isValidAccessToken: function () {
+      return this.accessToken.match('[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}') !== null
     }
   },
   methods: {
@@ -57,9 +56,11 @@ export default {
       axios.get('https://api.wanikani.com/v2/user', { headers })
         .then(response => {
           console.log('Hello', response.data.data.username)
+          this.setAccessToken(this.accessToken)
         })
         .catch(error => console.log(error))
-    }
+    },
+    ...mapMutations(['setAccessToken'])
   }
 }
 </script>
