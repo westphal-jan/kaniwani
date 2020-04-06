@@ -1,26 +1,53 @@
 <template>
   <div class="container">
-    <form @submit="giveAnswer">
-      <div class="row justify-content-center mb-3">
-        <h2>Vocabulary</h2>
+    <div class="row justify-content-center mb-3">
+      <h2>Vocabulary</h2>
+    </div>
+    <div v-show="isAnswering">
+      <form v-on:submit.prevent="submitAnswers">
+        <div v-for="(answer, idx) in givenAnswers" class="row justify-content-center mb-3" v-bind:key="idx">
+          <div class="col-5 col-auto">
+            <input v-model="answer.value" class="form-control form-control-lg" placeholder="Enter a translation ..." required>
+          </div>
+          <div class="col-1">
+            <button type="button" class="btn btn-block btn-lg btn-danger" @click="removeAnswer(idx)"><i class="fas fa-trash"/></button>
+          </div>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-2 mr-5">
+            <button type="button" class="btn btn-block btn-lg btn-primary" @click="addAnswer"><i class="fas fa-plus"/></button>
+          </div>
+          <div class="col-2 ml-5">
+            <button type="submit" class="btn btn-block btn-lg btn-success"><i class="fas fa-arrow-right"/></button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div v-show="!isAnswering">
+      <div v-for="(answer, idx) in validatedAnswers" class="mb-3" v-bind:key="idx">
+        <div class="row justify-content-center mb-2">
+          <div class="col-5">
+            <input v-model="answer.value" class="form-control form-control-lg" v-bind:style="{ borderColor: answer.isCorrect ? 'green': 'red'}" disabled>
+          </div>
+        </div>
+        <div v-show="answer.isCorrect">
+          <div class="row justify-content-center">
+            <div class="col-5">
+              <h6>Translation: ...</h6>
+            </div>
+          </div>
+          <div class="row justify-content-center">
+            <div class="col-12">
+              <h6>Kanji: ...</h6>
+            </div>
+          </div>
+        </div>
       </div>
-      <div v-for="(answer, idx) in answers" class="row justify-content-center mb-3" v-bind:key="idx">
-        <div class="col-5 col-auto">
-          <input v-model="answer.value" class="form-control form-control-lg" placeholder="Enter a translation ..." required>
-        </div>
-        <div class="col-1">
-          <button type="button" class="btn btn-block btn-lg btn-danger" @click="removeAnswer(idx)"><i class="fas fa-trash"/></button>
-        </div>
+      <div>
+        <hr />
+        Additional answers: ...
       </div>
-      <div class="row justify-content-center">
-        <div class="col-2 mr-5">
-          <button type="button" class="btn btn-block btn-lg btn-primary" @click="addAnswer"><i class="fas fa-plus"/></button>
-        </div>
-        <div class="col-2 ml-5">
-          <button type="submit" class="btn btn-block btn-lg btn-success"><i class="fas fa-check"/></button>
-        </div>
-      </div>
-    </form>
+    </div>
   </div>
 </template>
 
@@ -29,8 +56,11 @@ export default {
   name: 'Study',
   data () {
     return {
-      answers: [
+      isAnswering: true,
+      givenAnswers: [
         { value: '' }
+      ],
+      validatedAnswers: [
       ]
     }
   },
@@ -46,17 +76,24 @@ export default {
   },
   methods: {
     addAnswer: function () {
-      this.answers.push({ value: '' })
+      this.givenAnswers.push({ value: '' })
     },
     removeAnswer: function (idx) {
-      if (this.answers.length === 1) {
-        this.answers[0].value = ''
+      if (this.givenAnswers.length === 1) {
+        this.givenAnswers[0].value = ''
       } else {
-        this.answers.splice(idx, 1)
+        this.givenAnswers.splice(idx, 1)
       }
     },
-    giveAnswer: function () {
-      console.log('Answering')
+    submitAnswers: function () {
+      console.log('Answered')
+      this.isAnswering = false
+      this.validatedAnswers = this.givenAnswers.map((givenAnswer) => {
+        return {
+          value: givenAnswer.value,
+          isCorrect: true
+        }
+      })
     }
   }
 }
