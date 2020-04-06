@@ -29,9 +29,14 @@
             </button>
           </div>
         </div>
+        <hr />
         <div class="row justify-content-center">
           <div class="col-2 mr-5">
-            <button type="button" class="btn btn-block btn-lg btn-primary" @click="addAnswer">
+            <button
+              type="button"
+              class="btn btn-block btn-lg btn-primary"
+              @click="addAnswer"
+            >
               <i class="fas fa-plus" />
             </button>
           </div>
@@ -69,9 +74,20 @@
           </div>
         </div>
       </div>
+      <hr />
       <div>
-        <hr />
         <p>Additional answers: ...</p>
+      </div>
+      <hr />
+      <div class="row justify-content-center">
+        <div class="col-2">
+          <button
+            class="btn btn-block btn-lg btn-success"
+            @click="finishReviewing"
+          >
+            <i class="fas fa-arrow-right" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -120,6 +136,10 @@ export default {
           isCorrect: true,
         };
       });
+    },
+    finishReviewing: function () {
+      console.log("Finished Reviewing");
+      this.isAnswering = true;
     },
   },
 };
