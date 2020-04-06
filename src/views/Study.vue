@@ -4,30 +4,56 @@
       <h2>Vocabulary</h2>
     </div>
     <div v-show="isAnswering">
-      <form v-on:submit.prevent="submitAnswers">
-        <div v-for="(answer, idx) in givenAnswers" class="row justify-content-center mb-3" v-bind:key="idx">
-          <div class="col-5 col-auto">
-            <input v-model="answer.value" class="form-control form-control-lg" placeholder="Enter a translation ..." required>
+      <form @submit.prevent="submitAnswers">
+        <div
+          v-for="(answer, idx) in givenAnswers"
+          :key="idx"
+          class="row justify-content-center mb-3"
+        >
+          <div class="col-10 col-auto">
+            <input
+              v-model="answer.value"
+              class="form-control form-control-lg"
+              style="text-align: center;"
+              placeholder="Enter a translation ..."
+              required
+            />
           </div>
           <div class="col-1">
-            <button type="button" class="btn btn-block btn-lg btn-danger" @click="removeAnswer(idx)"><i class="fas fa-trash"/></button>
+            <button
+              type="button"
+              class="btn btn-block btn-lg btn-danger"
+              @click="removeAnswer(idx)"
+            >
+              <i class="fas fa-trash" />
+            </button>
           </div>
         </div>
         <div class="row justify-content-center">
           <div class="col-2 mr-5">
-            <button type="button" class="btn btn-block btn-lg btn-primary" @click="addAnswer"><i class="fas fa-plus"/></button>
+            <button type="button" class="btn btn-block btn-lg btn-primary" @click="addAnswer">
+              <i class="fas fa-plus" />
+            </button>
           </div>
           <div class="col-2 ml-5">
-            <button type="submit" class="btn btn-block btn-lg btn-success"><i class="fas fa-arrow-right"/></button>
+            <button type="submit" class="btn btn-block btn-lg btn-success">
+              <i class="fas fa-arrow-right" />
+            </button>
           </div>
         </div>
       </form>
     </div>
     <div v-show="!isAnswering">
-      <div v-for="(answer, idx) in validatedAnswers" class="mb-3" v-bind:key="idx">
+      <div v-for="(answer, idx) in validatedAnswers" :key="idx" class="mb-3">
         <div class="row justify-content-center mb-2">
-          <div class="col-5">
-            <input v-model="answer.value" class="form-control form-control-lg" v-bind:style="{ borderColor: answer.isCorrect ? 'green': 'red'}" disabled>
+          <div class="col-11">
+            <input
+              v-model="answer.value"
+              class="form-control form-control-lg"
+              style="text-align: center;"
+              :style="{ borderColor: answer.isCorrect ? 'green' : 'red' }"
+              disabled
+            />
           </div>
         </div>
         <div v-show="answer.isCorrect">
@@ -45,7 +71,7 @@
       </div>
       <div>
         <hr />
-        Additional answers: ...
+        <p>Additional answers: ...</p>
       </div>
     </div>
   </div>
@@ -53,48 +79,48 @@
 
 <script>
 export default {
-  name: 'Study',
-  data () {
+  name: "Study",
+  data() {
     return {
       isAnswering: true,
-      givenAnswers: [
-        { value: '' }
-      ],
-      validatedAnswers: [
-      ]
-    }
-  },
-  mounted () {
-    if (!this.$store.state.accessToken && process.env.NODE_ENV === 'production') {
-      this.$router.push({ path: '/kaniwani' })
-    }
+      givenAnswers: [{ value: "" }],
+      validatedAnswers: [],
+    };
   },
   computed: {
     canAnswer: function () {
-      return true
+      return true;
+    },
+  },
+  mounted() {
+    if (
+      !this.$store.state.accessToken &&
+      process.env.NODE_ENV === "production"
+    ) {
+      this.$router.push({ path: "/kaniwani" });
     }
   },
   methods: {
     addAnswer: function () {
-      this.givenAnswers.push({ value: '' })
+      this.givenAnswers.push({ value: "" });
     },
     removeAnswer: function (idx) {
       if (this.givenAnswers.length === 1) {
-        this.givenAnswers[0].value = ''
+        this.givenAnswers[0].value = "";
       } else {
-        this.givenAnswers.splice(idx, 1)
+        this.givenAnswers.splice(idx, 1);
       }
     },
     submitAnswers: function () {
-      console.log('Answered')
-      this.isAnswering = false
+      console.log("Answered");
+      this.isAnswering = false;
       this.validatedAnswers = this.givenAnswers.map((givenAnswer) => {
         return {
           value: givenAnswer.value,
-          isCorrect: true
-        }
-      })
-    }
-  }
-}
+          isCorrect: true,
+        };
+      });
+    },
+  },
+};
 </script>
