@@ -95,8 +95,9 @@
 </template>
 
 <script>
-import { getUserData, getVocabularyData } from "../api";
+import { getUserData } from "../api";
 import { mapMutations } from "vuex";
+
 export default {
   name: "Study",
   data() {
@@ -127,43 +128,6 @@ export default {
     }
     getUserData(this.$store.state.accessToken).then((userData) => {
       this.setUserData(userData.data);
-      const level = userData.data.level;
-      // const vocabularyForLevel = level > 3 ? 3 : level - 1;
-      getVocabularyData(this.$store.state.accessToken, level).then(
-        (vocabularyData) => {
-          const readingToVocabulary = {};
-          for (var i = 0; i < vocabularyData.data.length; i++) {
-            const vocabulary = vocabularyData.data[i];
-            const readings = vocabulary.data.readings.filter(
-              (reading) => reading.accepted_answer
-            );
-            for (var j = 0; j < readings.length; j++) {
-              const reading = readings[j].reading;
-              if (!(reading in readingToVocabulary)) {
-                readingToVocabulary[reading] = [vocabulary];
-              } else {
-                readingToVocabulary[reading].push(vocabulary);
-              }
-            }
-          }
-
-          // var m = { max: 0, r: [] };
-          // for (const reading in readingToVocabulary) {
-          //   console.log(
-          //     reading,
-          //     readingToVocabulary[reading].length,
-          //     readingToVocabulary[reading]
-          //   );
-          //   if (readingToVocabulary[reading].length > m.max) {
-          //     m.max = readingToVocabulary[reading].length;
-          //     m.r = [readingToVocabulary[reading]];
-          //   } else if (readingToVocabulary[reading].length == m.max) {
-          //     m.r.push(readingToVocabulary[reading]);
-          //   }
-          // }
-          // console.log(m);
-        }
-      );
     });
   },
   methods: {

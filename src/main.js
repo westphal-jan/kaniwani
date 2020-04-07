@@ -8,5 +8,17 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
+  mounted() {
+    if (localStorage.getItem("kanaToVocabulary")) {
+      try {
+        store.commit(
+          "setKanaToVocabulary",
+          JSON.parse(localStorage.getItem("kanaToVocabulary"))
+        );
+      } catch (e) {
+        localStorage.removeItem("cats");
+      }
+    }
+  },
   render: (h) => h(App),
 }).$mount("#app");
