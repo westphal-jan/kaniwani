@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import { mapMutations } from "vuex";
+import { getUserData } from "../api";
 
 export default {
   name: "Home",
@@ -73,13 +73,8 @@ export default {
   },
   methods: {
     validateAccessToken: function () {
-      const headers = {
-        Authorization: "Bearer " + this.accessToken,
-      };
-      axios
-        .get("https://api.wanikani.com/v2/user", { headers })
-        .then((response) => {
-          console.log("Hello", response.data.data.username);
+      getUserData(this.accessToken)
+        .then(() => {
           this.setAccessToken(this.accessToken);
           this.$router.push({ path: "/kaniwani/study" });
         })

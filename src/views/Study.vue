@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <h5>Hello {{ username }} (Level: {{ level }})</h5>
     <div class="row justify-content-center mb-3">
       <h2>Vocabulary</h2>
     </div>
@@ -94,6 +95,8 @@
 </template>
 
 <script>
+import { getUserData, getVocabularyData } from "../api";
+import { mapMutations } from "vuex";
 export default {
   name: "Study",
   data() {
@@ -107,6 +110,12 @@ export default {
     canAnswer: function () {
       return true;
     },
+    username: function () {
+      return this.$store.state.username;
+    },
+    level: function () {
+      return this.$store.state.level;
+    },
   },
   mounted() {
     if (
@@ -114,7 +123,18 @@ export default {
       process.env.NODE_ENV === "production"
     ) {
       this.$router.push({ path: "/kaniwani" });
+      return;
     }
+    getUserData(this.$store.state.accessToken).then((userData) => {
+      this.setUserData(userData.data);
+      const level = userData.data.level;
+      const vocabularyForLevel = level > 3 ? 3 : level - 1;
+      getVocabularyData(this.$store.state.accessToken, vocabularyForLevel).then(
+        (vocabularyData) => {
+          console.log(vocabularyData);
+        }
+      );
+    });
   },
   methods: {
     addAnswer: function () {
@@ -141,6 +161,7 @@ export default {
       console.log("Finished Reviewing");
       this.isAnswering = true;
     },
+    ...mapMutations(["setUserData"]),
   },
 };
 </script>

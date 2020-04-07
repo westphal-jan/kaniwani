@@ -8,11 +8,16 @@ Vue.use(vuejsStorage);
 export default new Vuex.Store({
   state: {
     accessToken: "",
+    username: "",
+    level: 1,
   },
   mutations: {
     setAccessToken(state, newAccessToken) {
       state.accessToken = newAccessToken;
-      console.log(state.accessToken);
+    },
+    setUserData(state, { username, level }) {
+      state.username = username;
+      state.level = level;
     },
   },
   actions: {},
