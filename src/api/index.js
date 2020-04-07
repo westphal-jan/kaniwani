@@ -18,7 +18,8 @@ export function getUserData(accessToken) {
 
 export function getVocabularyData(accessToken, maxLevel) {
   // TODO: consider paging
-  const levelsParamValue = [...Array(maxLevel).keys()].map((x) => x++).join();
+  console.log(maxLevel);
+  const levelsParamValue = [...Array(maxLevel).keys()].map((x) => x + 1).join();
   const vocabularyData = axios
     .get(
       `${wanikaniApiUrl}/subjects?types=vocabulary&levels=${levelsParamValue}`,
