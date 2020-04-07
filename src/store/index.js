@@ -13,6 +13,11 @@ export default new Vuex.Store({
     level: 1,
     kanaToVocabulary: {},
   },
+  getters: {
+    getNumKanaToVocabulary: (state) => {
+      return Object.keys(state.kanaToVocabulary).length;
+    },
+  },
   mutations: {
     setAccessToken(state, newAccessToken) {
       state.accessToken = newAccessToken;

@@ -2,7 +2,7 @@
   <div class="container">
     <h5>Hello {{ username }} (Level: {{ level }})</h5>
     <div class="row justify-content-center mb-3">
-      <h2>Vocabulary</h2>
+      <h2>{{ kana }}</h2>
     </div>
     <div v-show="isAnswering">
       <form @submit.prevent="submitAnswers">
@@ -78,6 +78,9 @@
       <hr />
       <div>
         <p>Additional answers: ...</p>
+        <div v-for="(vocabulary, idx) in validVocabulary" :key="idx">
+          {{ vocabulary.data.characters }}
+        </div>
       </div>
       <hr />
       <div class="row justify-content-center">
@@ -103,6 +106,8 @@ export default {
   data() {
     return {
       isAnswering: true,
+      kana: "",
+      validVocabulary: [],
       givenAnswers: [{ value: "" }],
       validatedAnswers: [],
     };
@@ -128,9 +133,18 @@ export default {
     }
     getUserData(this.$store.state.accessToken).then((userData) => {
       this.setUserData(userData.data);
+      this.newQuestion();
     });
   },
   methods: {
+    newQuestion: function () {
+      if (this.$store.getters.getNumKanaToVocabulary > 0) {
+        const kanas = Object.keys(this.$store.state.kanaToVocabulary);
+        const randomKana = kanas[(kanas.length * Math.random()) << 0];
+        this.validVocabulary = this.$store.state.kanaToVocabulary[randomKana];
+        this.kana = randomKana;
+      }
+    },
     addAnswer: function () {
       this.givenAnswers.push({ value: "" });
     },
@@ -154,6 +168,7 @@ export default {
     finishReviewing: function () {
       console.log("Finished Reviewing");
       this.isAnswering = true;
+      this.newQuestion();
     },
     ...mapMutations(["setUserData"]),
   },
