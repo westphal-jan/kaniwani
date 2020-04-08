@@ -6,13 +6,11 @@
     </div>
     <div v-show="isAnswering">
       <form @submit.prevent="submitAnswers">
-        <div
-          v-for="(answer, idx) in givenAnswers"
-          :key="idx"
-          class="row justify-content-center mb-3"
-        >
-          <div class="col-10 col-auto">
+        <div v-for="(answer, idx) in givenAnswers" :key="idx" class="row mb-3">
+          <div class="col-1"></div>
+          <div class="col-10 justify-content-center col-auto">
             <input
+              ref="answerField"
               v-model="answer.value"
               class="form-control form-control-lg"
               style="text-align: center;"
@@ -52,7 +50,7 @@
     <div v-show="!isAnswering">
       <div v-for="(answer, idx) in validatedAnswers" :key="idx" class="mb-3">
         <div class="row justify-content-center mb-2">
-          <div class="col-11">
+          <div class="col-10">
             <input
               v-model="givenAnswers[idx].value"
               class="form-control form-control-lg"
@@ -64,32 +62,40 @@
         </div>
         <div v-show="answer.hasValidAnswer">
           <div class="row justify-content-center">
-            <div class="col-5">
-              <h6>
-                Translation:
-                {{ answer.vocabulary ? answer.vocabulary.data.meanings : "" }}
-              </h6>
-            </div>
-          </div>
-          <div class="row justify-content-center">
             <div class="col-12">
               <h6>
-                Kanji:
+                Characters:
                 {{ answer.vocabulary ? answer.vocabulary.data.characters : "" }}
               </h6>
             </div>
           </div>
+          <div class="row justify-content-center">
+            <div class="col-5">
+              <h6>
+                Meaning:
+                {{
+                  answer.vocabulary
+                    ? getMeaningsWithAcceptedAnswers(answer.vocabulary).join(
+                        ", "
+                      )
+                    : ""
+                }}
+              </h6>
+            </div>
+          </div>
         </div>
       </div>
       <hr />
-      <div>
-        <p>Additional answers: ...</p>
+      <div v-show="additionalAnswers.length > 0">
+        <p><u>Answers not given:</u></p>
         <div v-for="(vocabulary, idx) in additionalAnswers" :key="idx">
-          <h6>Kanji: {{ vocabulary.data.characters }}</h6>
-          <h6>Translation: {{ vocabulary.data.meanings }}</h6>
+          <h6>{{ vocabulary.data.characters }}</h6>
+          <h6>
+            Meaning: {{ getMeaningsWithAcceptedAnswers(vocabulary).join(", ") }}
+          </h6>
         </div>
+        <hr />
       </div>
-      <hr />
       <div class="row justify-content-center">
         <div class="col-2">
           <button
@@ -160,6 +166,7 @@ export default {
       }
     },
     reset: function () {
+      this.isAnswering = true;
       this.givenAnswers = [{ value: "" }];
       this.validatedAnswers = [];
       this.additionalAnswers = [];
@@ -176,7 +183,6 @@ export default {
       }
     },
     submitAnswers: function () {
-      console.log("Answered");
       this.isAnswering = false;
 
       var vocabularyCopy = [...this.validVocabulary];
@@ -185,6 +191,9 @@ export default {
           const vocabulary = vocabularyCopy[i];
           const meanings = vocabulary.data.meanings;
           const bestMeaning = meanings.find((meaning) => {
+            if (!meaning.accepted_answer) {
+              return false;
+            }
             // TODO: use string-similarity to find similar match instead of total match
             return meaning.meaning.toLowerCase() === value.toLowerCase();
           });
@@ -199,9 +208,13 @@ export default {
       });
     },
     finishReviewing: function () {
-      console.log("Finished Reviewing");
-      this.isAnswering = true;
       this.reset();
+      this.$nextTick(() => this.$refs.answerField[0].focus());
+    },
+    getMeaningsWithAcceptedAnswers: function (vocabulary) {
+      return vocabulary.data.meanings
+        .filter((meaning) => meaning.accepted_answer)
+        .map((meaning) => meaning.meaning);
     },
     ...mapMutations(["setUserData"]),
   },
