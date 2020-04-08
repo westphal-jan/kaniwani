@@ -9,6 +9,7 @@ new Vue({
   router,
   store,
   mounted() {
+    console.log("App loaded");
     if (localStorage.getItem("kanaToVocabulary")) {
       try {
         store.commit(

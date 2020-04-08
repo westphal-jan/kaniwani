@@ -67,8 +67,11 @@ export default {
   },
   computed: {
     isValidAccessToken: function () {
-      return true;
-      // return this.accessToken.match('[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}') !== null
+      return (
+        this.accessToken.match(
+          "[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}"
+        ) !== null
+      );
     },
   },
   methods: {

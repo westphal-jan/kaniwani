@@ -54,23 +54,29 @@
         <div class="row justify-content-center mb-2">
           <div class="col-11">
             <input
-              v-model="answer.value"
+              v-model="givenAnswers[idx].value"
               class="form-control form-control-lg"
               style="text-align: center;"
-              :style="{ borderColor: answer.isCorrect ? 'green' : 'red' }"
+              :style="{ borderColor: answer.hasValidAnswer ? 'green' : 'red' }"
               disabled
             />
           </div>
         </div>
-        <div v-show="answer.isCorrect">
+        <div v-show="answer.hasValidAnswer">
           <div class="row justify-content-center">
             <div class="col-5">
-              <h6>Translation: ...</h6>
+              <h6>
+                Translation:
+                {{ answer.vocabulary ? answer.vocabulary.data.meanings : "" }}
+              </h6>
             </div>
           </div>
           <div class="row justify-content-center">
             <div class="col-12">
-              <h6>Kanji: ...</h6>
+              <h6>
+                Kanji:
+                {{ answer.vocabulary ? answer.vocabulary.data.characters : "" }}
+              </h6>
             </div>
           </div>
         </div>
@@ -78,8 +84,9 @@
       <hr />
       <div>
         <p>Additional answers: ...</p>
-        <div v-for="(vocabulary, idx) in validVocabulary" :key="idx">
-          {{ vocabulary.data.characters }}
+        <div v-for="(vocabulary, idx) in additionalAnswers" :key="idx">
+          <h6>Kanji: {{ vocabulary.data.characters }}</h6>
+          <h6>Translation: {{ vocabulary.data.meanings }}</h6>
         </div>
       </div>
       <hr />
@@ -110,6 +117,7 @@ export default {
       validVocabulary: [],
       givenAnswers: [{ value: "" }],
       validatedAnswers: [],
+      additionalAnswers: [],
     };
   },
   computed: {
@@ -133,7 +141,13 @@ export default {
     }
     getUserData(this.$store.state.accessToken).then((userData) => {
       this.setUserData(userData.data);
-      this.newQuestion();
+      this.reset();
+    });
+    window.addEventListener("keypress", (e) => {
+      // When 'enter' is clicked
+      if (!this.isAnswering && e.keyCode === 13) {
+        this.finishReviewing();
+      }
     });
   },
   methods: {
@@ -144,6 +158,12 @@ export default {
         this.validVocabulary = this.$store.state.kanaToVocabulary[randomKana];
         this.kana = randomKana;
       }
+    },
+    reset: function () {
+      this.givenAnswers = [{ value: "" }];
+      this.validatedAnswers = [];
+      this.additionalAnswers = [];
+      this.newQuestion();
     },
     addAnswer: function () {
       this.givenAnswers.push({ value: "" });
@@ -158,17 +178,30 @@ export default {
     submitAnswers: function () {
       console.log("Answered");
       this.isAnswering = false;
-      this.validatedAnswers = this.givenAnswers.map((givenAnswer) => {
-        return {
-          value: givenAnswer.value,
-          isCorrect: true,
-        };
+
+      var vocabularyCopy = [...this.validVocabulary];
+      this.givenAnswers.forEach(({ value }) => {
+        for (var i = 0; i < vocabularyCopy.length; i++) {
+          const vocabulary = vocabularyCopy[i];
+          const meanings = vocabulary.data.meanings;
+          const bestMeaning = meanings.find((meaning) => {
+            // TODO: use string-similarity to find similar match instead of total match
+            return meaning.meaning.toLowerCase() === value.toLowerCase();
+          });
+          const hasValidAnswer = bestMeaning !== undefined;
+          if (hasValidAnswer) {
+            this.validatedAnswers.push({ vocabulary, hasValidAnswer });
+          } else {
+            this.additionalAnswers.push(vocabulary);
+            this.validatedAnswers.push({ hasValidAnswer });
+          }
+        }
       });
     },
     finishReviewing: function () {
       console.log("Finished Reviewing");
       this.isAnswering = true;
-      this.newQuestion();
+      this.reset();
     },
     ...mapMutations(["setUserData"]),
   },
