@@ -12,10 +12,16 @@ export default new Vuex.Store({
     username: "",
     level: 1,
     kanaToVocabulary: {},
+    currentKana: "",
+    givenAnswersToValidVocabulary: {},
+    numAnswered: 0,
   },
   getters: {
     getNumKanaToVocabulary: (state) => {
       return Object.keys(state.kanaToVocabulary).length;
+    },
+    expectedVocabulary: (state) => {
+      return state.kanaToVocabulary[state.currentKana];
     },
   },
   mutations: {
@@ -32,17 +38,42 @@ export default new Vuex.Store({
         this.commit("updateKanaToVocabulary");
       }
     },
-    setKanaToVocabulary(state, kanaToVocabulary) {
-      console.log("Num items", kanaToVocabulary.data.length);
-      state.kanaToVocabulary = kanaToVocabulary;
-    },
     async updateKanaToVocabulary(state) {
       const maxLevel = state.level - 1;
       const kanaToVocabulary = await getKanaToVocabulary(
         state.accessToken,
         maxLevel
       );
-      state.kanaToVocabulary = kanaToVocabulary;
+      const sortedKanaToVocabulary = Object.keys(kanaToVocabulary)
+        .sort((a, b) => kanaToVocabulary[b].length - kanaToVocabulary[a].length)
+        .reduce(
+          (o, key) => Object.assign(o, { [key]: kanaToVocabulary[key] }),
+          {}
+        );
+      state.kanaToVocabulary = sortedKanaToVocabulary;
+      this.commit("newKana");
+    },
+    newKana(state) {
+      const kanas = Object.keys(state.kanaToVocabulary);
+      if (!kanas.length) {
+        return;
+      }
+      // TODO: Think about strategies
+      // const randomKana = kanas[(kanas.length * Math.random()) << 0];
+      const randomKana = kanas[state.numAnswered];
+      state.currentKana = randomKana;
+    },
+    giveAnswers(state, givenAnswers) {
+      // state.givenAnswers = givenAnswers;
+      var givenAnswersToValidVocabulary = {};
+      for (var givenAnswer of givenAnswers) {
+        givenAnswersToValidVocabulary[givenAnswer] =
+          state.kanaToVocabulary[state.currentKana];
+      }
+      state.givenAnswersToValidVocabulary = givenAnswersToValidVocabulary;
+    },
+    addNewAnswer(state) {
+      state.numAnswered++;
     },
   },
   actions: {},
