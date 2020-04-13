@@ -60,28 +60,24 @@
           </div>
         </div>
         <div v-show="answer.hasValidAnswer">
-          <div class="row justify-content-center">
-            <div class="col-12">
-              <h6>
-                Characters:
-                {{ answer.vocabulary ? answer.vocabulary.data.characters : "" }}
-              </h6>
-            </div>
-          </div>
-          <div class="row justify-content-center">
-            <div class="col-5">
-              <h6>
-                Meaning:
-                {{
-                answer.vocabulary
-                ? getMeaningsWithAcceptedAnswers(answer.vocabulary).join(
-                ", "
-                )
-                : ""
-                }}
-              </h6>
-            </div>
-          </div>
+          <h6>
+            Characters:
+            {{ answer.hasValidAnswer ? answer.vocabulary.data.characters : "" }}
+          </h6>
+          <h6>
+            Meaning:
+            {{
+            answer.hasValidAnswer
+            ? getMeaningsWithAcceptedAnswers(answer.vocabulary).join(
+            ", "
+            )
+            : ""
+            }}
+          </h6>
+          <h6>
+            Other readings:
+            {{ answer.hasValidAnswer ? getOtherReadings(answer.vocabulary) : "" }}
+          </h6>
         </div>
       </div>
       <hr />
@@ -90,8 +86,12 @@
           <u>Answers not given:</u>
         </p>
         <div v-for="(vocabulary, idx) in additionalAnswers" :key="idx">
-          <h6>{{ vocabulary.data.characters }}</h6>
+          <h6>Characters: {{ vocabulary.data.characters }}</h6>
           <h6>Meaning: {{ getMeaningsWithAcceptedAnswers(vocabulary).join(", ") }}</h6>
+          <h6>
+            Other readings:
+            {{ getOtherReadings(vocabulary) }}
+          </h6>
         </div>
         <hr />
       </div>
@@ -208,12 +208,20 @@ export default {
     },
     finishReviewing: function () {
       this.reset();
-      this.$nextTick(() => this.$refs.answerField[0].focus());
+      if (this.$refs.answerField.length > 0) {
+        this.$nextTick(() => this.$refs.answerField[0].focus());
+      }
     },
     getMeaningsWithAcceptedAnswers: function (vocabulary) {
       return vocabulary.data.meanings
         .filter((meaning) => meaning.accepted_answer)
         .map((meaning) => meaning.meaning);
+    },
+    getOtherReadings: function (vocabulary) {
+      const otherReadings = vocabulary.data.readings
+        .filter((reading) => reading.accepted_answer && reading.reading !== this.kana)
+        .map((reading) => reading.reading);
+      return otherReadings.length === 0 ? "None" : otherReadings.join();
     },
     ...mapMutations(["setUserData"]),
   },
