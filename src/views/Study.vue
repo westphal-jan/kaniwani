@@ -1,6 +1,9 @@
 <template>
   <div class="container">
-    <h5>Hello {{ username }} (Level: {{ level }})</h5>
+    <h5>
+      Hello {{ username }} (Level: {{ level }}) | Kanas:
+      {{ numKanasToVocabulary }}
+    </h5>
     <div class="row justify-content-center mb-3">
       <h2>{{ kana }}</h2>
     </div>
@@ -31,11 +34,7 @@
         <hr />
         <div class="row justify-content-center">
           <div class="col-2 mr-5">
-            <button
-              type="button"
-              class="btn btn-block btn-lg btn-primary"
-              @click="addAnswer"
-            >
+            <button type="button" class="btn btn-block btn-lg btn-primary" @click="addAnswer">
               <i class="fas fa-plus" />
             </button>
           </div>
@@ -74,11 +73,11 @@
               <h6>
                 Meaning:
                 {{
-                  answer.vocabulary
-                    ? getMeaningsWithAcceptedAnswers(answer.vocabulary).join(
-                        ", "
-                      )
-                    : ""
+                answer.vocabulary
+                ? getMeaningsWithAcceptedAnswers(answer.vocabulary).join(
+                ", "
+                )
+                : ""
                 }}
               </h6>
             </div>
@@ -87,21 +86,18 @@
       </div>
       <hr />
       <div v-show="additionalAnswers.length > 0">
-        <p><u>Answers not given:</u></p>
+        <p>
+          <u>Answers not given:</u>
+        </p>
         <div v-for="(vocabulary, idx) in additionalAnswers" :key="idx">
           <h6>{{ vocabulary.data.characters }}</h6>
-          <h6>
-            Meaning: {{ getMeaningsWithAcceptedAnswers(vocabulary).join(", ") }}
-          </h6>
+          <h6>Meaning: {{ getMeaningsWithAcceptedAnswers(vocabulary).join(", ") }}</h6>
         </div>
         <hr />
       </div>
       <div class="row justify-content-center">
         <div class="col-2">
-          <button
-            class="btn btn-block btn-lg btn-success"
-            @click="finishReviewing"
-          >
+          <button class="btn btn-block btn-lg btn-success" @click="finishReviewing">
             <i class="fas fa-arrow-right" />
           </button>
         </div>
@@ -135,6 +131,9 @@ export default {
     },
     level: function () {
       return this.$store.state.level;
+    },
+    numKanasToVocabulary: function () {
+      return this.$store.getters.getNumKanaToVocabulary;
     },
   },
   mounted() {

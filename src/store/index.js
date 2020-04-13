@@ -26,33 +26,30 @@ export default new Vuex.Store({
       state.username = username;
       if (state.level !== level) {
         const logMessage =
-          state.level === null ? "Initalize Vocabulary" : "Update Vocabulary";
+          state.level === 1 ? "Initalize Vocabulary" : "Update Vocabulary";
         console.log(logMessage);
         state.level = level;
         this.commit("updateKanaToVocabulary");
       }
     },
     setKanaToVocabulary(state, kanaToVocabulary) {
+      console.log("Num items", kanaToVocabulary.data.length);
       state.kanaToVocabulary = kanaToVocabulary;
     },
     async updateKanaToVocabulary(state) {
-      const maxLevel = state.level > 3 ? 3 : state.level - 1;
+      const maxLevel = state.level - 1;
       const kanaToVocabulary = await getKanaToVocabulary(
         state.accessToken,
         maxLevel
       );
       state.kanaToVocabulary = kanaToVocabulary;
-      localStorage.setItem(
-        "kanaToVocabulary",
-        JSON.stringify(state.kanaToVocabulary)
-      );
     },
   },
   actions: {},
   modules: {},
   plugins: [
     vuejsStorage({
-      keys: ["accessToken", "username", "level"],
+      keys: ["accessToken", "username"],
       namespace: "kaniwani",
       driver: vuejsStorage.drivers.localStorage,
     }),
