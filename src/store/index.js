@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import vuejsStorage from "vuejs-storage";
 import { getKanaToVocabulary } from "../api";
+import { findAnswerMatches } from "./util";
 
 Vue.use(Vuex);
 Vue.use(vuejsStorage);
@@ -67,12 +68,13 @@ export default new Vuex.Store({
       // state.givenAnswers = givenAnswers;
       var givenAnswersToValidVocabulary = {};
       for (var givenAnswer of givenAnswers) {
-        givenAnswersToValidVocabulary[givenAnswer] =
-          state.kanaToVocabulary[state.currentKana];
+        const validVocabulary = state.kanaToVocabulary[state.currentKana];
+        givenAnswersToValidVocabulary[givenAnswer] = findAnswerMatches(
+          givenAnswer,
+          validVocabulary
+        );
       }
       state.givenAnswersToValidVocabulary = givenAnswersToValidVocabulary;
-    },
-    addNewAnswer(state) {
       state.numAnswered++;
     },
   },

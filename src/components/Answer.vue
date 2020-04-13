@@ -13,7 +13,7 @@
 export default {
   name: "Answer",
   props: {
-    "kana": {
+    "currentKana": {
       type: String,
       default: "",
     },
@@ -34,13 +34,13 @@ export default {
       return vocabulary.data.meanings
         .filter((meaning) => meaning.accepted_answer)
         .map((meaning) => meaning.meaning)
-        .join();
+        .join(", ");
     },
     getOtherReadings: function (vocabulary) {
       const otherReadings = vocabulary.data.readings
-        .filter((reading) => reading.accepted_answer && reading.reading !== this.kana)
+        .filter((reading) => reading.accepted_answer && reading.reading !== this.currentKana)
         .map((reading) => reading.reading);
-      return otherReadings.length === 0 ? "None" : otherReadings.join();
+      return otherReadings.length === 0 ? "None" : otherReadings.join(", ");
     },
     submitAnswers: function () {
       this.isAnswering = false;

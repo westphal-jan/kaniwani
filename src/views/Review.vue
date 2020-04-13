@@ -8,13 +8,13 @@
             :value="answer"
             class="form-control form-control-lg"
             style="text-align: center;"
-            :style="{ borderColor: getVocabulary(answer) ? 'green' : 'red' }"
+            :style="{ borderColor: getVocabulary(answer).length > 0 ? 'green' : 'red' }"
             disabled
           />
         </div>
       </div>
       <div v-for="(vocabulary, idx2) in getVocabulary(answer)" :key="idx2">
-        <answer :kana="kana" :vocabulary="vocabulary" />
+        <answer :current-kana="currentKana" :vocabulary="vocabulary" />
       </div>
     </div>
 
@@ -41,6 +41,7 @@
 <script>
 import Answer from "../components/Answer";
 import Status from "../components/Status";
+import { mapMutations } from 'vuex';
 
 export default {
   name: "Review",
@@ -49,8 +50,8 @@ export default {
     "status": Status,
   },
   computed: {
-    kana: function() {
-      return this.$store.state.kana;
+    currentKana: function() {
+      return this.$store.state.currentKana;
     },
     givenAnswers: function () {
       return Object.keys(this.$store.state.givenAnswersToValidVocabulary);
@@ -68,15 +69,17 @@ export default {
     });
   },
   methods: {
+    ...mapMutations(["newKana"]),
     getVocabulary: function (answer) {
       return this.$store.state.givenAnswersToValidVocabulary[answer];
     },
     finishReviewing: function () {
-      this.$router.push("/kaniwani/study");
-      // this.reset();
-      // if (this.$refs.answerField.length > 0) {
-      //   this.$nextTick(() => this.$refs.answerField[0].focus());
-      // }
+      this.newKana();
+      this.$router.push("/kaniwani/study").catch(error => {
+        if (error.name != "NavigationDuplicated") {
+          throw error;
+        }
+      });
     },
   }
 }

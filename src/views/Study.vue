@@ -51,6 +51,11 @@ export default {
       givenAnswers: [{ value: "" }],
     };
   },
+  mounted() {
+    if (this.$refs.answerField.length > 0) {
+      this.$nextTick(() => this.$refs.answerField[0].focus());
+    }
+  },
   methods: {
     ...mapMutations(["giveAnswers"]),
     addAnswer: function () {
@@ -65,7 +70,11 @@ export default {
     },
     submitAnswers: function () {
       this.giveAnswers(this.givenAnswers.map((answer) => answer.value));
-      this.$router.push("/kaniwani/review");
+      this.$router.push("/kaniwani/review").catch(error => {
+        if (error.name != "NavigationDuplicated") {
+          throw error;
+        }
+      });
       // var vocabularyCopy = [...this.validVocabulary];
       // this.givenAnswers.forEach(({ value }) => {
       //   for (var i = 0; i < vocabularyCopy.length; i++) {
