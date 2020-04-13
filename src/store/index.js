@@ -2,7 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import vuejsStorage from "vuejs-storage";
 import { getKanaToVocabulary } from "../api";
-import { findAnswerMatches } from "./util";
+import { evaluateGivenAnswers } from "./util";
 
 Vue.use(Vuex);
 Vue.use(vuejsStorage);
@@ -15,6 +15,7 @@ export default new Vuex.Store({
     kanaToVocabulary: {},
     currentKana: "",
     givenAnswersToValidVocabulary: {},
+    unansweredVocabulary: [],
     numAnswered: 0,
   },
   getters: {
@@ -65,16 +66,14 @@ export default new Vuex.Store({
       state.currentKana = randomKana;
     },
     giveAnswers(state, givenAnswers) {
-      // state.givenAnswers = givenAnswers;
-      var givenAnswersToValidVocabulary = {};
-      for (var givenAnswer of givenAnswers) {
-        const validVocabulary = state.kanaToVocabulary[state.currentKana];
-        givenAnswersToValidVocabulary[givenAnswer] = findAnswerMatches(
-          givenAnswer,
-          validVocabulary
-        );
-      }
+      const validVocabulary = state.kanaToVocabulary[state.currentKana];
+      const {
+        givenAnswersToValidVocabulary,
+        unansweredVocabulary,
+      } = evaluateGivenAnswers(givenAnswers, validVocabulary);
+
       state.givenAnswersToValidVocabulary = givenAnswersToValidVocabulary;
+      state.unansweredVocabulary = unansweredVocabulary;
       state.numAnswered++;
     },
   },

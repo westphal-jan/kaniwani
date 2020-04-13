@@ -75,29 +75,6 @@ export default {
           throw error;
         }
       });
-      // var vocabularyCopy = [...this.validVocabulary];
-      // this.givenAnswers.forEach(({ value }) => {
-      //   for (var i = 0; i < vocabularyCopy.length; i++) {
-      //     const vocabulary = vocabularyCopy[i];
-      //     const meanings = vocabulary.data.meanings;
-      //     const bestMeaning = meanings.find((meaning) => {
-      //       if (!meaning.accepted_answer) {
-      //         return false;
-      //       }
-      //       // TODO: use string-similarity to find similar match instead of total match
-      //       return meaning.meaning.toLowerCase() === value.toLowerCase();
-      //     });
-      //     const hasValidAnswer = bestMeaning !== undefined;
-      //     if (hasValidAnswer) {
-      //       this.validatedAnswers.push({ vocabulary, hasValidAnswer });
-      //       break;
-      //     } else {
-      //       this.additionalAnswers.push(vocabulary);
-      //       this.validatedAnswers.push({ hasValidAnswer });
-      //     }
-      //   }
-      // });
-      // this.addNewAnswer();
     },
   },
 };

@@ -15,19 +15,21 @@
       </div>
       <div v-for="(vocabulary, idx2) in getVocabulary(answer)" :key="idx2">
         <answer :current-kana="currentKana" :vocabulary="vocabulary" />
+        <hr width="50%" />
       </div>
     </div>
 
     <hr />
-    <!-- <div v-show="additionalAnswers.length > 0">
+    <div v-show="unansweredVocabulary.length > 0">
       <p>
         <u>Answers not given:</u>
       </p>
-      <div v-for="(vocabulary, idx) in additionalAnswers" :key="idx">
-        <answer :kana="kana" :vocabulary="vocabulary" />
+      <div v-for="(vocabulary, idx) in unansweredVocabulary" :key="idx">
+        <answer :current-kana="currentKana" :vocabulary="vocabulary" />
+        <hr width="50%" />
       </div>
       <hr />
-    </div>-->
+    </div>
     <div class="row justify-content-center">
       <div class="col-2">
         <button class="btn btn-block btn-lg btn-success" @click="finishReviewing">
@@ -58,6 +60,9 @@ export default {
     },
     givenAnswersToValidVocabulary: function () {
       return this.$store.state.givenAnswersToValidVocabulary;
+    },
+    unansweredVocabulary: function () {
+      return this.$store.state.unansweredVocabulary;
     },
   },
   mounted () {
